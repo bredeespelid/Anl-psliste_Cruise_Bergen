@@ -9,6 +9,7 @@ import time
 # Set up Chrome options
 options = webdriver.ChromeOptions()
 options.add_argument("--window-size=1920x1080")
+options.add_argument("--headless")  # Run Chrome in headless mode (no GUI)
 
 # Initialize the WebDriver with options
 driver = webdriver.Chrome(options=options)
