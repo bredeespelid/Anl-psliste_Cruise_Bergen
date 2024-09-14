@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import time
 
-# Set up Chrome options
+# Set up Chrome options for headless mode
 options = webdriver.ChromeOptions()
 options.add_argument("--window-size=1920x1080")
 options.add_argument("--headless")  # Run Chrome in headless mode (no GUI)
@@ -26,7 +26,7 @@ ships_data = {
 
 df = pd.DataFrame(ships_data)
 
-# Function to extract Passengers and Flag state
+# Function to extract Passengers
 def get_ship_details(ship_name):
     driver.get('https://www.cruisemapper.com/ships')
 
@@ -52,7 +52,7 @@ def get_ship_details(ship_name):
     # Parse the page
     soup = BeautifulSoup(driver.page_source, 'html.parser')
     
-    # Find the right table with passengers and flag state
+    # Find the right table with passengers
     tables = soup.find_all('table', class_='table-striped')
 
     # Extract Passengers from the second table (pull-right)
@@ -72,21 +72,12 @@ def get_ship_details(ship_name):
     else:
         passengers = 'N/A'
 
-    # Extract Flag state from the first table (pull-left)
-    if len(tables) > 0:
-        left_table = tables[0]  # The first table on the left
-        flag_state_row = left_table.find('td', string='Flag state')
-        flag_state = flag_state_row.find_next_sibling('td').text.strip() if flag_state_row else 'N/A'
-    else:
-        flag_state = 'N/A'
-
-    return passengers, flag_state
+    return passengers
 
 # Iterate over each ship and update the DataFrame
 for index, row in df.iterrows():
-    passengers, flag_state = get_ship_details(row['SKIP'])
+    passengers = get_ship_details(row['SKIP'])
     df.at[index, 'PASSENGERS'] = passengers
-    df.at[index, 'FLAG_STATE'] = flag_state
 
 # Close the WebDriver
 driver.quit()
